@@ -37,3 +37,10 @@ let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
 ```
 
 Fungsi dari variable status_line dan filename menjadi lebih jelas, dan lebih mudah lagi untuk menambahkan handling routing lain (dengan menambahkan else-if block tambahan). Metode handle_connection juga menjadi lebih singkat dan mudah dimengerti.
+
+<br>
+
+### 4. simulation of slow response
+Dalam pemahaman saya, slow response ini terjadi karena web server yang dibuat masih merupakan single-threaded server. Karena ia hanya memiliki satu thread, ia hanya bisa menanggapi satu demi satu setiap request yang datang sesuai urutan diterimanya. Ia tidak bisa menangani beberapa request secara bersamaan.
+
+Single-threadedness ini yang membuatnya memakan waktu untuk menampilkan webpage 127.0.0.1 saat sebelumnya diakses 127.0.0.1/sleep di browser lain, karena ia perlu menyelesaikan request `/sleep` terlebih dahulu dan mengirim response yang sesuai sebelum menangani request `/` yang datang setelahnya.
