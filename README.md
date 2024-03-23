@@ -44,3 +44,10 @@ Fungsi dari variable status_line dan filename menjadi lebih jelas, dan lebih mud
 Dalam pemahaman saya, slow response ini terjadi karena web server yang dibuat masih merupakan single-threaded server. Karena ia hanya memiliki satu thread, ia hanya bisa menanggapi satu demi satu setiap request yang datang sesuai urutan diterimanya. Ia tidak bisa menangani beberapa request secara bersamaan.
 
 Single-threadedness ini yang membuatnya memakan waktu untuk menampilkan webpage 127.0.0.1 saat sebelumnya diakses 127.0.0.1/sleep di browser lain, karena ia perlu menyelesaikan request `/sleep` terlebih dahulu dan mengirim response yang sesuai sebelum menangani request `/` yang datang setelahnya.
+
+<br>
+
+### 5. multithreaded server
+Menurut pemahaman saya, ThreadPool bekerja dengan pertama didefinisikan apa saja yang dimiliki oleh struct ThreadPool, yaitu workers (Vec<Worker>) dan sender (mpsc::Sender<Job>). Atribut sender yang dimilikinya menjadi channel dimana 'jobs' dikirim untuk dieksekusikan oleh para 'worker'. Kemudian didefinisikan beberapa fungsi yang dimiliki oleh struct ThreadPool, yaitu `new` dan `execute`. Function new akan membuat ThreadPool dengan ukuran yang ditentukan oleh variable size. Ia akan menginisialisasi channel sender dan channel receiver, kemudian membuat thread worker sebanyak variable size yang ditentukan dan memberikan akses channel receiver kepada workers tersebut melalui `Arc<Mutex<mpsc::Receiver<Job>>>`. Function execute digunakan untuk menambahkan 'jobs' ke dalam thread pool lewat channel sender untuk dieksekusi oleh sebuah worker thread.
+
+Struct Worker mendefinisikan isi worker, yaitu id (usize) dan thread (thread::JoinHandle<()>). Dalam implementasi struct ini hanya ada satu function, yaitu function `new`. Function new ini membuat worker thread baru yang menggunakan worker id dan clone dari channel receiver sebagai parameter function-nya. Function ini membuat thread baru dengan `thread::spawn`, thread ini akan senantiasa melakukan loop untk menunggu mendapatkan dan mengeksekusikan 'job' dari channel receiver.
